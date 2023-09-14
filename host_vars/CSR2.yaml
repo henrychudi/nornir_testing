@@ -1,0 +1,41 @@
+isis:
+  processes:
+    - process: 20000
+  instance_id:
+    - instance: 102
+  net_id:
+    - net: "47.0020.0000.0000.0002.00"
+bgp:
+    bgp_asn: 10000
+    bgp_rid: 172.30.255.2
+    l2vpn_enabled: true
+    neighbors:
+      - neighbor: 172.30.255.3
+        remote_as: "10000"
+      - neighbor: 172.30.255.4
+        remote_as: "10000"
+
+interface:
+    ip_addr: 172.30.255.2
+
+segment_routing:
+    prefix0: 172.30.255.2
+    pce: 10.255.255.100
+    source_pce: 172.30.255.2
+
+bridge_domains:
+      - bridge_domain_id: 1
+        evpn_instance_id: 1
+        interfaces:
+          - interface: GigabitEthernet3
+            instance_id: 1
+            service_instance_id: 1
+          - interface: GigabitEthernet6
+            instance_id: 1
+            service_instance_id: 1
+      - bridge_domain_id: 2
+        evpn_instance_id: 2
+        interfaces:
+          - interface: Port-channel2
+            instance_id: 2
+            service_instance_id: 2

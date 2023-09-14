@@ -1,0 +1,32 @@
+isis:
+  processes:
+    - process: 10000
+  instance_id:
+    - instance: 101
+  net_id:
+    - net: "47.0010.0000.0000.0003.00"
+bgp:
+    bgp_asn: 10000
+    bgp_rid: 172.30.255.3
+    l2vpn_enabled: true
+    neighbors:
+      - neighbor: 172.30.255.1
+        remote_as: "10000"
+      - neighbor: 172.30.255.2
+        remote_as: "10000"
+      - neighbor: 172.30.255.4
+        remote_as: "10000"
+    vrf:
+      name: CustC
+      customer_neighbor: 172.24.24.1
+      customer_remote_as: 65024
+
+interface:
+    ip_addr: 172.30.255.3
+
+segment_routing:
+    prefix0: 172.30.255.3
+    pce: 10.255.255.100
+    source_pce: 172.30.255.3
+
+bridge_domains: []

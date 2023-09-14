@@ -1,0 +1,25 @@
+isis:
+  processes:
+    - process: 10000
+    - process: 20000
+  processes_redi:
+    - process_redi: 20000
+    - process_redi: 10000
+  rmap_id:
+    - rmap: "SC24"
+    - rmap: "SC13"
+  instance_id:
+    - instance: 101
+    - instance: 102
+  net_id:
+    - net: "47.0010.0000.0000.0099.00"
+    - net: "47.0020.0000.0000.0199.00"
+interface:
+    ip_addr: 172.30.255.6
+
+segment_routing:
+    prefix0: 172.30.255.6
+    pce: 10.255.255.100
+    source_pce: 172.30.255.6
+
+bridge_domains: []

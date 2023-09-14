@@ -1,0 +1,55 @@
+CSR1:
+    hostname: "10.10.20.1"
+    groups:
+      - cisco_group
+    data:
+        country: usa
+        region: north
+        state: washington
+        coast: west
+CSR2:
+    hostname: "10.10.20.2"
+    groups:
+      - cisco_group
+    data:
+        country: usa
+        region: north
+        state: washington
+        coast: west
+CSR3:
+    hostname: "10.10.20.3"
+    groups:
+      - cisco_group
+    data:
+        country: usa
+        region: south
+        state: washington
+        coast: west
+CSR4:
+    hostname: "10.10.20.4"
+    groups:
+      - cisco_group
+    data:
+        country: usa
+        region: south
+        state: washington
+        coast: west
+
+CSR88:
+    hostname: "10.10.20.5"
+    groups:
+      - cisco_group
+    data:
+        country: usa
+        region: south
+        state: washington
+        coast: west
+CSR99:
+    hostname: "10.10.20.6"
+    groups:
+      - cisco_group
+    data:
+        country: usa
+        region: north
+        state: washington
+        coast: west

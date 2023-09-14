@@ -1,0 +1,148 @@
+<config>
+    <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+        <interface>
+            <Loopback>
+                <name>0</name>
+                <ip>
+                    <address>
+                        <primary>
+                            <address>{{ host.facts.interface.ip_addr }}</address>
+                            <mask>255.255.255.255</mask>
+                        </primary>
+                    </address>
+                </ip>
+                <logging>
+                    <event>
+                        <link-status/>
+                    </event>
+                </logging>
+            </Loopback>
+        </interface>
+        <router>
+            {% if host.facts.bgp is defined %}
+            <bgp xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-bgp">
+                <id>{{ host.facts.bgp.bgp_asn }}</id>
+                <bgp>
+                    <default>
+                        <ipv4-unicast>false</ipv4-unicast>
+                    </default>
+                    <log-neighbor-changes>true</log-neighbor-changes>
+                    <router-id>
+                        <ip-id>{{ host.facts.bgp.bgp_rid }}</ip-id>
+                    </router-id>
+                </bgp>
+                {% for neighbor in host.facts.bgp.neighbors %}
+                <neighbor>
+                    <id>{{ neighbor.neighbor }}</id>
+                    <remote-as>{{ neighbor.remote_as }}</remote-as>
+                    <update-source>
+                        <interface>
+                            <Loopback>0</Loopback>
+                        </interface>
+                    </update-source>
+                </neighbor>
+                {% endfor %}
+                <address-family>
+                    <no-vrf>
+                        <ipv4>
+                            <af-name>unicast</af-name>
+                            <ipv4-unicast>
+                                {% for neighbor in host.facts.bgp.neighbors %}
+                                <neighbor>
+                                    <id>{{ neighbor.neighbor }}</id>
+                                    <activate/>
+                                </neighbor>
+                                {% endfor %}
+                            </ipv4-unicast>
+                        </ipv4>
+                        <vpnv4>
+                            <af-name>unicast</af-name>
+                            <vpnv4-unicast>
+                                {% for neighbor in host.facts.bgp.neighbors %}
+                                <neighbor>
+                                    <id>{{ neighbor.neighbor }}</id>
+                                    <activate/>
+                                    <send-community>
+                                        <send-community-where>extended</send-community-where>
+                                    </send-community>
+                                </neighbor>
+                                {% endfor %}
+                            </vpnv4-unicast>
+                        </vpnv4>
+                        {% if host.facts.bgp.l2vpn_enabled is defined and host.facts.bgp.l2vpn_enabled %}
+                        <l2vpn>
+                            <af-name>evpn</af-name>
+                            <l2vpn-evpn>
+                                {% for neighbor in host.facts.bgp.neighbors %}
+                                <neighbor>
+                                    <id>{{ neighbor.neighbor }}</id>
+                                    <activate/>
+                                    <send-community>
+                                        <send-community-where>both</send-community-where>
+                                    </send-community>
+                                </neighbor>
+                                {% endfor %}
+                            </l2vpn-evpn>
+                        </l2vpn>
+                        {% endif %}
+                    </no-vrf>
+                </address-family>
+            </bgp>
+            {% endif %}
+            <isis-container xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-isis">
+                {% for process in host.facts.isis.processes %}
+                <isis>
+                    <area-tag>{{ process.process }}</area-tag>
+                    <metric-style>
+                        <wide/>
+                    </metric-style>
+                    {% if 'processes_redi' in host.facts.isis %}
+                    <redistribute>
+                        <isis-redistribute>
+                            <isis>
+                                <area-tag>{{ host.facts.isis.processes_redi[loop.index0].process_redi }}</area-tag>
+                                <ip>
+                                    <route-map>{{ host.facts.isis.rmap_id[loop.index0].rmap }}</route-map>
+                                </ip>
+                            </isis>
+                        </isis-redistribute>
+                    </redistribute>
+                    {% endif %}
+                    <advertise>
+                        <passive-only/>
+                    </advertise>
+                    <distribute>
+                        <link-state>
+                            <link-state-with-instance>
+                                <instance-id>{{ host.facts.isis.instance_id[loop.index0].instance }}</instance-id>
+                            </link-state-with-instance>
+                        </link-state>
+                    </distribute>
+                    <is-type>
+                        <levels>level-2-only</levels>
+                    </is-type>
+                    <log-adj-changes>
+                        <log-adjacency-changes>true</log-adjacency-changes>
+                        <all/>
+                    </log-adj-changes>
+                    <mpls>
+                        <traffic-eng>
+                            <level-2/>
+                            <router-id>Loopback0</router-id>
+                        </traffic-eng>
+                    </mpls>
+                    <net>
+                        <tag>{{ host.facts.isis.net_id[loop.index0].net }}</tag>
+                    </net>
+                    <passive-interface>
+                        <interface>Loopback0</interface>
+                    </passive-interface>
+                    <segment-routing xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-segment-routing">
+                        <mpls/>
+                    </segment-routing>
+                </isis>
+                {% endfor %}
+            </isis-container>
+        </router>
+    </native>
+</config>

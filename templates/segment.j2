@@ -1,0 +1,57 @@
+<config>
+    <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+        {% if host.facts.bridge_domains is defined and host.facts.bridge_domains|length > 0 %}
+        <bridge-domain>
+            {% for bridge_domain in host.facts.bridge_domains %}
+            <brd-id xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-bridge-domain">
+                <bridge-domain-id>{{ bridge_domain.bridge_domain_id }}</bridge-domain-id>
+                <mac>
+                    <learning/>
+                </mac>
+                <member>
+                    {% for interface in bridge_domain.interfaces %}
+                    <member-interface>
+                        <interface>{{ interface.interface }}</interface>
+                        <service-instance-list>
+                            <instance-id>{{ interface.instance_id }}</instance-id>
+                        </service-instance-list>
+                        <service-instance>{{ interface.service_instance_id }}</service-instance>
+                    </member-interface>
+                    {% endfor %}
+                    <evpn-instance>
+                        <instance-num>{{ bridge_domain.evpn_instance_id }}</instance-num>
+                    </evpn-instance>
+                </member>
+            </brd-id>
+            {% endfor %}
+        </bridge-domain>
+        {% endif %}
+        <segment-routing>
+            <mpls xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-segment-routing">
+                <connected-prefix-sid-map>
+                    <address-family>
+                        <ipv4>
+                            <prefixes>
+                                <ipprefix>{{ host.facts.segment_routing.prefix0 }}/32</ipprefix>
+                                <index>
+                                    <range-start>1</range-start>
+                                    <range>1</range>
+                                </index>
+                            </prefixes>
+                        </ipv4>
+                    </address-family>
+                </connected-prefix-sid-map>
+            </mpls>
+            <traffic-eng xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-segment-routing">
+                <pcc>
+                    <pce>
+                        <pce-ipv4-list>
+                            <address>{{ host.facts.segment_routing.pce }}</address>
+                            <source-address>{{ host.facts.segment_routing.source_pce }}</source-address>
+                        </pce-ipv4-list>
+                    </pce>
+                </pcc>
+            </traffic-eng>
+        </segment-routing>
+    </native>
+</config>
